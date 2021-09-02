@@ -82,30 +82,32 @@ func (r *repository) FindByID(ctx context.Context, id string) (domain.QuestionIn
 			return questionInfo, nil
 		}
 	}
-
 	level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method FindByID", id))
 	return domain.QuestionInfo{}, RepositoryError("No Question Found")
 }
 
 func (r *repository) FindByUser(ctx context.Context, userId string) ([]domain.QuestionInfo, error) {
-	userQuestions := make([]domain.QuestionInfo, 0)
+	userQuestions := []domain.QuestionInfo{}
 	DBQuestions := r.db
 	for _, questionInfo := range DBQuestions {
 		if questionInfo.Question.UserID == userId {
 			userQuestions = append(userQuestions, questionInfo)
 		}
 	}
-
 	return userQuestions, nil
 }
 
 func (r *repository) Create(ctx context.Context, question domain.Question) (domain.Question, error) {
+	for _, questionInfo := range r.db {
+		if questionInfo.Question.ID == question.ID {
+			return domain.Question{}, RepositoryError("Question Already Exists")
+		}
+	}
 	r.db = append(r.db, domain.QuestionInfo{Question: question})
 	return question, nil
 }
 
 func (r *repository) Update(ctx context.Context, questionInfo domain.QuestionInfo) (domain.QuestionInfo, error) {
-
 	var updated bool
 	for i, questionData := range r.db {
 		if questionData.Question.ID == questionInfo.Question.ID {
@@ -160,7 +162,6 @@ func (r repository) AddAnswer(ctx context.Context, answer domain.Answer) (domain
 			}
 		}
 	}
-
 	level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method AddAnswer", answer.QuestionID))
 	return domain.QuestionInfo{}, RepositoryError("No Question Found")
 }
