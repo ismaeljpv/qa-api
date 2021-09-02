@@ -4,14 +4,28 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 )
 
+var validate *validator.Validate = validator.New()
+
 func RequestError(e string) error {
 	return errors.New(e)
+}
+
+func validateStruct(v *validator.Validate, s interface{}) error {
+	errors := validate.Struct(s)
+	if errors != nil {
+		for _, err := range errors.(validator.ValidationErrors) {
+			return RequestError(fmt.Sprintf("Error on field %v, data is %v", err.Field(), err.ActualTag()))
+		}
+	}
+	return nil
 }
 
 type (
@@ -19,9 +33,6 @@ type (
 
 	FindQuestionByIDRequest struct {
 		ID string `json:"id"`
-	}
-	FindQuestionByIDResponse struct {
-		QuestionInfo domain.QuestionInfo `json:"questionInfo"`
 	}
 
 	FindQuestionsByUserRequest struct {
@@ -84,7 +95,13 @@ func DecodeCreateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 	if err != nil {
 		return nil, err
 	}
+
 	req.Question = body
+	valErr := validateStruct(validate, &req.Question)
+	if valErr != nil {
+		return nil, valErr
+	}
+
 	return req, nil
 }
 
@@ -98,6 +115,11 @@ func DecodeAddAnswerRequest(ctx context.Context, r *http.Request) (interface{}, 
 	}
 
 	req.Answer = ans
+	valErr := validateStruct(validate, &req.Answer)
+	if valErr != nil {
+		return nil, valErr
+	}
+
 	return req, nil
 }
 
@@ -117,6 +139,10 @@ func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 
 	req.ID = quetionId
 	req.QuestionInfo = info
+	valErr := validateStruct(validate, &req.QuestionInfo)
+	if valErr != nil {
+		return nil, valErr
+	}
 
 	return req, nil
 }

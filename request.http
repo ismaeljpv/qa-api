@@ -3,7 +3,7 @@ GET http://localhost:8080/question
 Content-Type: application/json
 
 ### Get Question By ID
-GET http://localhost:8080/question/1
+GET http://localhost:8080/question/2
 Content-Type: application/json
 
 ### Get Question By User
@@ -15,8 +15,7 @@ POST http://localhost:8080/question
 Content-Type: application/json
 
 {   
-    "id": "",
-    "statement": "Is this a microservice?",
+    "statement": "What is a microservice?",
     "userId": "1",
     "createdOn": 0
 }
@@ -26,11 +25,9 @@ POST http://localhost:8080/question/answer
 Content-Type: application/json
 
 {   
-    //"id": "",
     "anwser": "Yes this is a microservice",
-    "userId": "9",
-    "questionId": "14ddb0f0-de4c-491e-9c2f-1cdcff481e32",
-    "createdOn": 0
+    "userId": "1",
+    "questionId": "2"
 }
 
 ### Update Question And Answer
@@ -38,15 +35,15 @@ PUT http://localhost:8080/question/1
 Content-Type: application/json
 
 {
-    "questionInfo": {
+    "question": {
       "id": "1",
-      "statement": "Do You Think That GOPHERS Rocks?",
+      "statement": "Do You Think That GOPHERS Rocks hard?",
       "userId": "1",
       "createdOn": 1630587411
     },
     "answer": {
       "id": "1",
-      "anwser": "Yes they do!",
+      "anwser": "Yes they Do!",
       "questionId": "1",
       "userId": "2",
       "createdOn": 1630587411
