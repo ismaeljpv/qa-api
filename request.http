@@ -1,0 +1,58 @@
+### Get All Questions
+GET http://localhost:8080/question
+Content-Type: application/json
+
+### Get Question By ID
+GET http://localhost:8080/question/1
+Content-Type: application/json
+
+### Get Question By User
+GET http://localhost:8080/question/user/1
+Content-Type: application/json
+
+### Create Question
+POST http://localhost:8080/question
+Content-Type: application/json
+
+{   
+    "id": "",
+    "statement": "Is this a microservice?",
+    "userId": "1",
+    "createdOn": 0
+}
+
+### Add answer to question
+POST http://localhost:8080/question/answer
+Content-Type: application/json
+
+{   
+    //"id": "",
+    "anwser": "Yes this is a microservice",
+    "userId": "9",
+    "questionId": "14ddb0f0-de4c-491e-9c2f-1cdcff481e32",
+    "createdOn": 0
+}
+
+### Update Question And Answer
+PUT http://localhost:8080/question/1
+Content-Type: application/json
+
+{
+    "questionInfo": {
+      "id": "1",
+      "statement": "Do You Think That GOPHERS Rocks?",
+      "userId": "1",
+      "createdOn": 1630587411
+    },
+    "answer": {
+      "id": "1",
+      "anwser": "Yes they do!",
+      "questionId": "1",
+      "userId": "2",
+      "createdOn": 1630587411
+    }
+}
+
+### Delete Question
+DELETE http://localhost:8080/question/2
+Content-Type: application/json
