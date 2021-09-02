@@ -1,21 +1,21 @@
 package domain
 
 type Question struct {
-	ID        string `json:"id"`
-	Statement string `json:"statement"`
-	UserID    string `json:"userId"`
-	CreatedOn int64  `json:"createdOn"`
+	ID        string `json:"id,omitempty"`
+	Statement string `json:"statement" validate:"required"`
+	UserID    string `json:"userId" validate:"required"`
+	CreatedOn int64  `json:"createdOn,omitempty"`
 }
 
 type Answer struct {
 	ID         string `json:"id,omitempty"`
-	Answer     string `json:"anwser"`
-	QuestionID string `json:"questionId"`
-	UserID     string `json:"userId"`
-	CreatedOn  int64  `json:"createdOn"`
+	Answer     string `json:"anwser,omitempty" validate:"required"`
+	QuestionID string `json:"questionId,omitempty" validate:"required"`
+	UserID     string `json:"userId,omitempty" validate:"required"`
+	CreatedOn  int64  `json:"createdOn,omitempty"`
 }
 
 type QuestionInfo struct {
-	Question Question `json:"questionInfo"`
-	Answer   Answer   `json:"answer,omitempty"`
+	Question Question `json:"question" validate:"required"`
+	Answer   Answer   `json:"answer" validate:"required"`
 }
