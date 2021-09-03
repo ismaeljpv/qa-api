@@ -2,6 +2,7 @@ package transport
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
@@ -38,7 +39,7 @@ func makeFindAllQuestionsEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeFindQuestionByIDEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(FindQuestionByIDRequest)
+		req := request.(IDParamRequest)
 		question, err := s.FindByID(ctx, req.ID)
 		return question, err
 	}
@@ -78,10 +79,13 @@ func makeUpdateQuestionEndPoint(s service.Service) endpoint.Endpoint {
 
 func makeDeleteQuestionEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(DeleteQuestionRequest)
+		req := request.(IDParamRequest)
 		msg, err := s.Delete(ctx, req.ID)
-		return DeleteQuestionResponse{
+
+		return GenericMessageResponse{
 			Message: msg,
+			Status:  http.StatusText(http.StatusOK),
+			Code:    http.StatusOK,
 		}, err
 	}
 }

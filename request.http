@@ -3,7 +3,7 @@ GET http://localhost:8080/question
 Content-Type: application/json
 
 ### Get Question By ID
-GET http://localhost:8080/question/12cf8ade-4223-46a3-8ec5-c1263c17c1be
+GET http://localhost:8080/question/c1ced94c-a190-4122-9849-5244b551218c
 Content-Type: application/json
 
 ### Get Question By User
@@ -15,9 +15,8 @@ POST http://localhost:8080/question
 Content-Type: application/json
 
 {   
-    "statement": "Do you like programming?",
-    "userId": "2",
-    "createdOn": 0
+    "statement": "What do you recomend to build microsevices whit Go?",
+    "userId": "4"
 }
 
 ### Add answer to question
@@ -25,31 +24,31 @@ POST http://localhost:8080/question/answer
 Content-Type: application/json
 
 {   
-    "anwser": "Yes this is a microservice in did",
-    "userId": "90",
-    "questionId": "12cf8ade-4223-46a3-8ec5-c1263c17c1be"
+    "anwser": "I strongly recomend GoKit features for microservices delelopment with Go",
+    "userId": "33",
+    "questionId": "662080f6-264f-4c09-bd9e-2e0f4b7a10de"
 }
 
 ### Update Question And Answer
-PUT http://localhost:8080/question/12cf8ade-4223-46a3-8ec5-c1263c17c1be
+PUT http://localhost:8080/question/c1ced94c-a190-4122-9849-5244b551218c
 Content-Type: application/json
 
 {
     "question": {
-      "id": "12cf8ade-4223-46a3-8ec5-c1263c17c1be",
-      "statement": "Do you love programming in golang?",
-      "userId": "2",
-      "createdOn": 1630644619
+      "id": "c1ced94c-a190-4122-9849-5244b551218c",
+      "statement": "Do you like programming in Go?",
+      "userId": "1",
+      "createdOn": 1630682081
     },
     "answer": {
-      "id": "a6e08d01-7a87-454a-af14-d05fde803304",
-      "anwser": "Of course i loved programming in go!",
-      "questionId": "12cf8ade-4223-46a3-8ec5-c1263c17c1be",
-      "userId": "90",
-      "createdOn": 1630644641
+      "id": "3258613d-344d-4fa3-aca0-d05dfa8d347f",
+      "anwser": "Yes I love programming in Go!",
+      "questionId": "c1ced94c-a190-4122-9849-5244b551218c",
+      "userId": "2",
+      "createdOn": 1630682112
     }
   }
 
 ### Delete Question
-DELETE http://localhost:8080/question/0d262461-18d3-424c-981d-4114745d143c
+DELETE http://localhost:8080/question/0cb5cd65-251f-4ade-97e3-89b20fe22676
 Content-Type: application/json

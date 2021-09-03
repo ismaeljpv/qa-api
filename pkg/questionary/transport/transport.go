@@ -31,10 +31,6 @@ func validateStruct(v *validator.Validate, s interface{}) error {
 type (
 	GenericRequest struct{}
 
-	FindQuestionByIDRequest struct {
-		ID string `json:"id"`
-	}
-
 	FindQuestionsByUserRequest struct {
 		UserID string `json:"userId"`
 	}
@@ -52,31 +48,33 @@ type (
 		QuestionInfo domain.QuestionInfo `json:"questionInfo"`
 	}
 
-	DeleteQuestionRequest struct {
+	IDParamRequest struct {
 		ID string `json:"ID"`
 	}
 
-	DeleteQuestionResponse struct {
+	GenericMessageResponse struct {
 		Message string `json:"message"`
+		Status  string `json:"status"`
+		Code    int64  `json:"code"`
 	}
 )
 
 func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(response)
+}
+
+func DecodeIDParamRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, ok := mux.Vars(r)["id"]
+	if !ok {
+		return nil, RequestError("Please pass the ID of the question")
+	}
+	return IDParamRequest{ID: id}, nil
 }
 
 func DecodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req GenericRequest
 	return req, nil
-}
-
-func DecodeFindQuestionByIDRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, ok := mux.Vars(r)["id"]
-
-	if !ok {
-		return nil, RequestError("Please pass the ID of the question")
-	}
-	return FindQuestionByIDRequest{ID: id}, nil
 }
 
 func DecodeFindQuestionByUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -145,13 +143,4 @@ func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 	}
 
 	return req, nil
-}
-
-func DecodeDeleteQuestionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, ok := mux.Vars(r)["id"]
-
-	if !ok {
-		return nil, RequestError("Please pass the ID of the question")
-	}
-	return DeleteQuestionRequest{ID: id}, nil
 }

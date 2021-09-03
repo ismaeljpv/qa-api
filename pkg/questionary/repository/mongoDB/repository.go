@@ -33,16 +33,16 @@ type repository struct {
 
 func initDBConnection(ctx context.Context, logger log.Logger, uri string) *mongo.Database {
 
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctxTO, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	client, connErr := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	client, connErr := mongo.Connect(ctxTO, options.Client().ApplyURI(uri))
 	if connErr != nil {
 		level.Error(logger).Log("msg", connErr.Error())
 	}
 
-	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
+	ctxTO, cancel = context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	err := client.Ping(ctx, readpref.Primary())
+	err := client.Ping(ctxTO, readpref.Primary())
 	if err != nil {
 		level.Warn(logger).Log("msg", err.Error())
 	}
@@ -78,6 +78,11 @@ func (r *repository) FindAll(ctx context.Context) ([]domain.QuestionInfo, error)
 		return []domain.QuestionInfo{}, RepositoryError(err.Error())
 	}
 	cursor.Close(context.TODO())
+
+	if len(results) == 0 {
+		return []domain.QuestionInfo{}, nil
+	}
+
 	return results, nil
 }
 
@@ -117,6 +122,10 @@ func (r *repository) FindByUser(ctx context.Context, userId string) ([]domain.Qu
 		return []domain.QuestionInfo{}, RepositoryError(err.Error())
 	}
 	cursor.Close(context.TODO())
+
+	if len(results) == 0 {
+		return []domain.QuestionInfo{}, nil
+	}
 	return results, nil
 }
 
@@ -163,9 +172,13 @@ func (r *repository) Update(ctx context.Context, questionInfo domain.QuestionInf
 		}}}
 
 	updated, err := QICollection.UpdateOne(ctx, filter, update)
-	if err != nil || updated.ModifiedCount == 0 {
+	if err != nil {
 		level.Warn(r.logger).Log("msg", fmt.Sprintf("There Was An Error Updating The Data Of Question With ID [%v]", questionInfo.Question.ID))
 		return domain.QuestionInfo{}, RepositoryError("There Was An Error Updating The Question/Answer")
+	}
+
+	if updated.ModifiedCount == 0 {
+		return domain.QuestionInfo{}, RepositoryError("The Question/Answer Has No Modifications")
 	}
 
 	return result, nil
