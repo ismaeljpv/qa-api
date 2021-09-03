@@ -22,7 +22,7 @@ func NewHTTPServer(ctx context.Context, endpoints transport.Endpoints) http.Hand
 
 	router.Methods("GET").Path("/question/{id}").Handler(httptransport.NewServer(
 		endpoints.FindQuestionById,
-		transport.DecodeFindQuestionByIDRequest,
+		transport.DecodeIDParamRequest,
 		transport.EncodeResponse,
 	))
 
@@ -52,7 +52,7 @@ func NewHTTPServer(ctx context.Context, endpoints transport.Endpoints) http.Hand
 
 	router.Methods("DELETE").Path("/question/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteQuestion,
-		transport.DecodeDeleteQuestionRequest,
+		transport.DecodeIDParamRequest,
 		transport.EncodeResponse,
 	))
 

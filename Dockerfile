@@ -32,6 +32,9 @@ WORKDIR /dist
 # Copy binary from build to main folder
 RUN cp /app/cmd/questionary/main .
 
+# Copy .env file
+RUN cp /app/.env .
+
 # Export necessary port
 EXPOSE 8080
 

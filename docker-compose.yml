@@ -1,0 +1,13 @@
+version: "3.5"
+services:
+  qa-app:
+    image: qa-api
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - qa-net
+
+networks:
+  qa-net:
+    name: qa-net
