@@ -6,3 +6,5 @@ The technologies implemented in this API are:
 - Gorilla/mux
 - Gokit
 - Docker
+- Testify
+- MondoDB

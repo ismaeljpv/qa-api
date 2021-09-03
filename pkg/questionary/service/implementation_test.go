@@ -24,7 +24,7 @@ func NewMockRepository(logger log.Logger) repository.Repository {
 		"time:", log.DefaultTimestampUTC,
 		"caller", log.DefaultCaller,
 	)
-	return mock.NewRepository([]domain.QuestionInfo{}, logger)
+	return mock.NewRepository(logger)
 }
 
 func NewMockService(logger log.Logger) service.Service {

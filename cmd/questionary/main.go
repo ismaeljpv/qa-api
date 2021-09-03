@@ -11,8 +11,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
-	"github.com/ismaeljpv/qa-api/pkg/questionary/repository/mock"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/repository/mongoDB"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/server"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
@@ -36,7 +35,7 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	repo := mock.NewRepository([]domain.QuestionInfo{}, logger)
+	repo := mongoDB.NewRepository(ctx, logger, "mongodb://localhost:27017")
 	serv := service.NewService(repo, logger)
 	endpoints := transport.MakeEndpoints(serv)
 

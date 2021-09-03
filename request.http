@@ -3,7 +3,7 @@ GET http://localhost:8080/question
 Content-Type: application/json
 
 ### Get Question By ID
-GET http://localhost:8080/question/2
+GET http://localhost:8080/question/12cf8ade-4223-46a3-8ec5-c1263c17c1be
 Content-Type: application/json
 
 ### Get Question By User
@@ -15,8 +15,8 @@ POST http://localhost:8080/question
 Content-Type: application/json
 
 {   
-    "statement": "What is a microservice?",
-    "userId": "1",
+    "statement": "Do you like programming?",
+    "userId": "2",
     "createdOn": 0
 }
 
@@ -25,31 +25,31 @@ POST http://localhost:8080/question/answer
 Content-Type: application/json
 
 {   
-    "anwser": "Yes this is a microservice",
-    "userId": "1",
-    "questionId": "2"
+    "anwser": "Yes this is a microservice in did",
+    "userId": "90",
+    "questionId": "12cf8ade-4223-46a3-8ec5-c1263c17c1be"
 }
 
 ### Update Question And Answer
-PUT http://localhost:8080/question/1
+PUT http://localhost:8080/question/12cf8ade-4223-46a3-8ec5-c1263c17c1be
 Content-Type: application/json
 
 {
     "question": {
-      "id": "1",
-      "statement": "Do You Think That GOPHERS Rocks hard?",
-      "userId": "1",
-      "createdOn": 1630587411
+      "id": "12cf8ade-4223-46a3-8ec5-c1263c17c1be",
+      "statement": "Do you love programming in golang?",
+      "userId": "2",
+      "createdOn": 1630644619
     },
     "answer": {
-      "id": "1",
-      "anwser": "Yes they Do!",
-      "questionId": "1",
-      "userId": "2",
-      "createdOn": 1630587411
+      "id": "a6e08d01-7a87-454a-af14-d05fde803304",
+      "anwser": "Of course i loved programming in go!",
+      "questionId": "12cf8ade-4223-46a3-8ec5-c1263c17c1be",
+      "userId": "90",
+      "createdOn": 1630644641
     }
-}
+  }
 
 ### Delete Question
-DELETE http://localhost:8080/question/2
+DELETE http://localhost:8080/question/0d262461-18d3-424c-981d-4114745d143c
 Content-Type: application/json

@@ -63,10 +63,10 @@ type repository struct {
 	logger log.Logger
 }
 
-func NewRepository(db []domain.QuestionInfo, logger log.Logger) repo.Repository {
+func NewRepository(logger log.Logger) repo.Repository {
 	return &repository{
 		db:     questionData,
-		logger: log.With(logger, "repository", "db"),
+		logger: logger,
 	}
 }
 
