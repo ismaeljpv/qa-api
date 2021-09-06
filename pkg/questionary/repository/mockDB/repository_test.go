@@ -1,4 +1,4 @@
-package mock_test
+package mockDB_test
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/repository"
-	"github.com/ismaeljpv/qa-api/pkg/questionary/repository/mock"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/repository/mockDB"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +24,7 @@ func NewMockRepository(logger log.Logger) repository.Repository {
 		"time:", log.DefaultTimestampUTC,
 		"caller", log.DefaultCaller,
 	)
-	return mock.NewRepository(logger)
+	return mockDB.NewRepository(logger)
 }
 
 type testBody struct {

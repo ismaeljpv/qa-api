@@ -1,4 +1,4 @@
-package mock
+package mockDB
 
 import (
 	"context"
@@ -102,7 +102,7 @@ func (r *repository) Create(ctx context.Context, question domain.Question) (doma
 		if questionInfo.Question.ID == question.ID {
 			return domain.Question{}, httpError.NewClientError(errors.New("Conflict - Question already exists"),
 				http.StatusConflict,
-				"Question is already registered")
+				"Question Already Exists")
 		}
 	}
 	r.db = append(r.db, domain.QuestionInfo{Question: question})
@@ -166,7 +166,7 @@ func (r repository) AddAnswer(ctx context.Context, answer domain.Answer) (domain
 			} else {
 				return domain.QuestionInfo{}, httpError.NewClientError(errors.New("Question is already answered"),
 					http.StatusConflict,
-					"Question has an anwser!")
+					"The question already has an answer!")
 			}
 		}
 	}

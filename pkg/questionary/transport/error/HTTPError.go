@@ -30,10 +30,7 @@ func NewServerError(err error, detail string) InternalServerError {
 }
 
 func (e *HTTPError) Error() string {
-	if e.Cause == nil {
-		return e.Detail
-	}
-	return e.Detail + " : " + e.Cause.Error()
+	return e.Detail
 }
 
 // ResponseBody returns JSON response body.
