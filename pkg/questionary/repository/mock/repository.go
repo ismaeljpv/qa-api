@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -11,11 +12,8 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	repo "github.com/ismaeljpv/qa-api/pkg/questionary/repository"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
-
-func RepositoryError(e string) error {
-	return errors.New(e)
-}
 
 var questionData = []domain.QuestionInfo{
 	{
@@ -83,7 +81,9 @@ func (r *repository) FindByID(ctx context.Context, id string) (domain.QuestionIn
 		}
 	}
 	level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method FindByID", id))
-	return domain.QuestionInfo{}, RepositoryError("No Question Found")
+	return domain.QuestionInfo{}, httpError.NewClientError(errors.New(fmt.Sprintf("No question found by ID %v", id)),
+		http.StatusNotFound,
+		"No Question Found")
 }
 
 func (r *repository) FindByUser(ctx context.Context, userId string) ([]domain.QuestionInfo, error) {
@@ -100,7 +100,9 @@ func (r *repository) FindByUser(ctx context.Context, userId string) ([]domain.Qu
 func (r *repository) Create(ctx context.Context, question domain.Question) (domain.Question, error) {
 	for _, questionInfo := range r.db {
 		if questionInfo.Question.ID == question.ID {
-			return domain.Question{}, RepositoryError("Question Already Exists")
+			return domain.Question{}, httpError.NewClientError(errors.New("Conflict - Question already exists"),
+				http.StatusConflict,
+				"Question is already registered")
 		}
 	}
 	r.db = append(r.db, domain.QuestionInfo{Question: question})
@@ -131,7 +133,9 @@ func (r *repository) Update(ctx context.Context, questionInfo domain.QuestionInf
 	}
 
 	level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method Update", questionInfo.Question.ID))
-	return domain.QuestionInfo{}, RepositoryError("No Question Found To Update")
+	return domain.QuestionInfo{}, httpError.NewClientError(errors.New(fmt.Sprintf("No question found by ID %v", questionInfo.Question.ID)),
+		http.StatusNotFound,
+		"No Question Found To Update")
 }
 
 func (r *repository) Delete(ctx context.Context, id string) (string, error) {
@@ -147,7 +151,9 @@ func (r *repository) Delete(ctx context.Context, id string) (string, error) {
 		return "Question Deleted Successfully!", nil
 	} else {
 		level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method Delete", id))
-		return "", RepositoryError("No Question Found")
+		return "", httpError.NewClientError(errors.New(fmt.Sprintf("No question found by ID %v", id)),
+			http.StatusNotFound,
+			"No Question Found")
 	}
 }
 
@@ -158,10 +164,14 @@ func (r repository) AddAnswer(ctx context.Context, answer domain.Answer) (domain
 				r.db[i].Answer = answer
 				return r.db[i], nil
 			} else {
-				return domain.QuestionInfo{}, RepositoryError("The question already has an answer!")
+				return domain.QuestionInfo{}, httpError.NewClientError(errors.New("Question is already answered"),
+					http.StatusConflict,
+					"Question has an anwser!")
 			}
 		}
 	}
 	level.Warn(r.logger).Log("msg", fmt.Sprintf("No Question Found by ID %v, method AddAnswer", answer.QuestionID))
-	return domain.QuestionInfo{}, RepositoryError("No Question Found")
+	return domain.QuestionInfo{}, httpError.NewClientError(errors.New(fmt.Sprintf("No question found by ID %v", answer.QuestionID)),
+		http.StatusNotFound,
+		"No Question Found")
 }
