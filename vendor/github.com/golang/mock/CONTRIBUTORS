@@ -1,5 +1,5 @@
-# This is the official list of people who can contribute
-# (and typically have contributed) code to the Snappy-Go repository.
+# This is the official list of people who can contribute (and typically
+# have contributed) code to the gomock repository.
 # The AUTHORS file lists the copyright holders; this file
 # lists people.  For example, Google employees are listed here
 # but not in AUTHORS, because Google holds the copyright.
@@ -23,15 +23,15 @@
 
 # Names should be added to this file like so:
 #     Name <email address>
+#
+# An entry with two email addresses specifies that the
+# first address should be used in the submit logs and
+# that the second address should be recognized as the
+# same person when interacting with Rietveld.
 
 # Please keep the list sorted.
 
-Damian Gryski <dgryski@gmail.com>
-Jan Mercl <0xjnml@gmail.com>
-Kai Backman <kaib@golang.org>
-Marc-Antoine Ruel <maruel@chromium.org>
-Nigel Tao <nigeltao@golang.org>
-Rob Pike <r@golang.org>
-Rodolfo Carvalho <rhcarvalho@gmail.com>
-Russ Cox <rsc@golang.org>
-Sebastien Binet <seb.binet@gmail.com>
+Aaron Jacobs <jacobsa@google.com> <aaronjjacobs@gmail.com>
+Alex Reece <awreece@gmail.com>
+David Symonds <dsymonds@golang.org>
+Ryan Barrett <ryanb@google.com>
