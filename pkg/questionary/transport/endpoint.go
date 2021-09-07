@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
 )
 
@@ -55,16 +56,16 @@ func makeFindQuestiosnByUserEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeCreateQuestionEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CreateQuestionRequest)
-		question, err := s.Create(ctx, req.Question)
+		question := request.(domain.Question)
+		question, err := s.Create(ctx, question)
 		return question, err
 	}
 }
 
 func makeAddAnswerEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(AddAnswerRequest)
-		questionInfo, err := s.AddAnswer(ctx, req.Answer)
+		answer := request.(domain.Answer)
+		questionInfo, err := s.AddAnswer(ctx, answer)
 		return questionInfo, err
 	}
 }

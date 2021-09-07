@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/ismaeljpv/qa-api/config"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/config"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/repository/mongoDB"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/server"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
@@ -31,7 +31,10 @@ func main() {
 		"caller", log.DefaultCaller,
 	)
 	errs := make(chan error)
-	connURI := config.GetDBConnURI(mongoDBURI)
+	connURI, confErr := config.GetConfig(mongoDBURI)
+	if confErr != nil {
+		panic(confErr)
+	}
 
 	level.Info(logger).Log("msg", fmt.Sprintf("Connection URI prepared -> %v", connURI))
 	level.Info(logger).Log("msg", "service started")
@@ -40,7 +43,11 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	repo := mongoDB.NewRepository(ctx, logger, connURI)
+	repo, repoErr := mongoDB.NewRepository(ctx, logger, connURI)
+	if repoErr != nil {
+		panic(repoErr)
+	}
+
 	serv := service.NewService(repo, logger)
 	endpoints := transport.MakeEndpoints(serv)
 
@@ -56,4 +63,5 @@ func main() {
 	}()
 
 	level.Error(logger).Log("exit", <-errs)
+	close(errs)
 }

@@ -9,51 +9,64 @@ import (
 	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
 )
 
+// Use as a wrapper around the handler functions.
+type rootHandler func(http.ResponseWriter, *http.Request) error
+
 func NewHTTPServer(ctx context.Context, endpoints transport.Endpoints) http.Handler {
 
 	router := mux.NewRouter()
 	router.Use(commonMiddleware)
+	serverOpts := []httptransport.ServerOption{
+		httptransport.ServerErrorEncoder(transport.ErrorHandler),
+	}
 
 	router.Methods("GET").Path("/question").Handler(httptransport.NewServer(
 		endpoints.FindAllQuestions,
 		transport.DecodeRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("GET").Path("/question/{id}").Handler(httptransport.NewServer(
 		endpoints.FindQuestionById,
 		transport.DecodeIDParamRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("GET").Path("/question/user/{userId}").Handler(httptransport.NewServer(
 		endpoints.FindQuestionsByUser,
 		transport.DecodeFindQuestionByUserRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("POST").Path("/question").Handler(httptransport.NewServer(
 		endpoints.CreateQuestion,
 		transport.DecodeCreateQuestionRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("POST").Path("/question/answer").Handler(httptransport.NewServer(
 		endpoints.AddAnswer,
 		transport.DecodeAddAnswerRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("PUT").Path("/question/{id}").Handler(httptransport.NewServer(
 		endpoints.UpdateQuestion,
 		transport.DecodeUpdateQuestionRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	router.Methods("DELETE").Path("/question/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteQuestion,
 		transport.DecodeIDParamRequest,
 		transport.EncodeResponse,
+		serverOpts...,
 	))
 
 	return router

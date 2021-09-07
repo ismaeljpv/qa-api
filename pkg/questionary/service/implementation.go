@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -11,11 +12,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/repository"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
-
-func ImplementationError(e string) error {
-	return errors.New(e)
-}
 
 type service struct {
 	repository repository.Repository
@@ -57,7 +55,7 @@ func (s *service) Create(ctx context.Context, question domain.Question) (domain.
 	uuid, idErr := uuid.NewV4()
 	if idErr != nil {
 		level.Warn(s.logger).Log("msg", "Error creating uuid for Question, method Create")
-		return domain.Question{}, idErr
+		return domain.Question{}, httpError.NewServerError(idErr, "Internal Server Error! There was a problem processing your request.")
 	}
 
 	question.ID = uuid.String()
@@ -72,12 +70,16 @@ func (s *service) Create(ctx context.Context, question domain.Question) (domain.
 func (s *service) Update(ctx context.Context, questionInfo domain.QuestionInfo, id string) (domain.QuestionInfo, error) {
 	if questionInfo.Question.ID != id {
 		level.Warn(s.logger).Log("msg", fmt.Sprintf("The Path Param ID doesnt match with the body ID [%v!=%v], method update", questionInfo.Question.ID, id))
-		return domain.QuestionInfo{}, ImplementationError("There is a inconsistency with the information of the request")
+		return domain.QuestionInfo{}, httpError.NewClientError(errors.New("Invalid Request"),
+			http.StatusBadRequest,
+			"There is a inconsistency with the information of the request")
 	}
 
 	if questionInfo.Answer.ID == "" {
 		level.Warn(s.logger).Log("msg", "The answer provided in the request doesnt have an ID, method update")
-		return domain.QuestionInfo{}, ImplementationError("The answer passed to update is not valid")
+		return domain.QuestionInfo{}, httpError.NewClientError(errors.New("Invalid Request"),
+			http.StatusBadRequest,
+			"The answer passed to update is not valid")
 	}
 
 	updatedQuestion, err := s.repository.Update(ctx, questionInfo)
@@ -100,7 +102,7 @@ func (s *service) AddAnswer(ctx context.Context, answer domain.Answer) (domain.Q
 	uuid, idErr := uuid.NewV4()
 	if idErr != nil {
 		level.Warn(s.logger).Log("msg", "Error creating uuid for Answer, method AddAnswer")
-		return domain.QuestionInfo{}, idErr
+		return domain.QuestionInfo{}, httpError.NewServerError(idErr, "Internal Server Error! There was a problem processing your request.")
 	}
 
 	answer.ID = uuid.String()

@@ -10,37 +10,19 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
 
+// Use as a wrapper around the handler functions.
+type errorHandler func(http.ResponseWriter, *http.Request) error
+
 var validate *validator.Validate = validator.New()
-
-func RequestError(e string) error {
-	return errors.New(e)
-}
-
-func validateStruct(v *validator.Validate, s interface{}) error {
-	errors := validate.Struct(s)
-	if errors != nil {
-		for _, err := range errors.(validator.ValidationErrors) {
-			return RequestError(fmt.Sprintf("Error on field %v, data is %v", err.Field(), err.ActualTag()))
-		}
-	}
-	return nil
-}
 
 type (
 	GenericRequest struct{}
 
 	FindQuestionsByUserRequest struct {
 		UserID string `json:"userId"`
-	}
-
-	CreateQuestionRequest struct {
-		Question domain.Question `json:"question"`
-	}
-
-	AddAnswerRequest struct {
-		Answer domain.Answer `json:"answer"`
 	}
 
 	UpdateQuestionRequest struct {
@@ -59,15 +41,25 @@ type (
 	}
 )
 
-func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	w.WriteHeader(http.StatusOK)
-	return json.NewEncoder(w).Encode(response)
+func validateStruct(v *validator.Validate, s interface{}) error {
+	errors := validate.Struct(s)
+	if errors != nil {
+		for _, err := range errors.(validator.ValidationErrors) {
+			return httpError.NewClientError(err,
+				http.StatusBadRequest,
+				fmt.Sprintf("Error on field %v, data is %v", err.Field(), err.ActualTag()),
+			)
+		}
+	}
+	return nil
 }
 
 func DecodeIDParamRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	id, ok := mux.Vars(r)["id"]
 	if !ok {
-		return nil, RequestError("Please pass the ID of the question")
+		return nil, httpError.NewClientError(errors.New("Question ID is required"),
+			http.StatusBadRequest,
+			"Question ID is required")
 	}
 	return IDParamRequest{ID: id}, nil
 }
@@ -81,44 +73,41 @@ func DecodeFindQuestionByUserRequest(ctx context.Context, r *http.Request) (inte
 	userId, ok := mux.Vars(r)["userId"]
 
 	if !ok {
-		return nil, RequestError("Please pass the User ID of the question")
+		return nil, httpError.NewClientError(errors.New("User ID is required"),
+			http.StatusBadRequest,
+			"User ID is required")
 	}
 	return FindQuestionsByUserRequest{UserID: userId}, nil
 }
 
 func DecodeCreateQuestionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req CreateQuestionRequest
 	var body domain.Question
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Question = body
-	valErr := validateStruct(validate, &req.Question)
+	valErr := validateStruct(validate, body)
 	if valErr != nil {
 		return nil, valErr
 	}
 
-	return req, nil
+	return body, nil
 }
 
 func DecodeAddAnswerRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req AddAnswerRequest
-	var ans domain.Answer
-
-	err := json.NewDecoder(r.Body).Decode(&ans)
+	var body domain.Answer
+	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Answer = ans
-	valErr := validateStruct(validate, &req.Answer)
+	valErr := validateStruct(validate, &body)
 	if valErr != nil {
 		return nil, valErr
 	}
 
-	return req, nil
+	return body, nil
 }
 
 func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -127,7 +116,9 @@ func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 
 	quetionId, ok := mux.Vars(r)["id"]
 	if !ok {
-		return nil, RequestError("Please pass the ID of the question")
+		return nil, httpError.NewClientError(errors.New("Question ID is required"),
+			http.StatusBadRequest,
+			"Question ID is required")
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&info)
@@ -143,4 +134,44 @@ func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 	}
 
 	return req, nil
+}
+
+func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	w.WriteHeader(http.StatusOK)
+	return json.NewEncoder(w).Encode(response)
+}
+
+func ErrorHandler(ctx context.Context, err error, w http.ResponseWriter) {
+
+	switch er := err.(type) {
+	case httpError.ClientError:
+		body, err := er.ResponseBody()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("There was an error procesing your request"))
+			return
+		}
+		status, headers := er.ResponseHeaders()
+		for k, v := range headers {
+			w.Header().Set(k, v)
+		}
+		w.WriteHeader(status)
+		w.Write(body)
+	case httpError.InternalServerError:
+		body, err := er.ResponseBody()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("There was an error procesing your request"))
+			return
+		}
+		_, headers := er.ResponseHeaders()
+		for k, v := range headers {
+			w.Header().Set(k, v)
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(body)
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("There was an error procesing your request"))
+	}
 }
