@@ -19,6 +19,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+//This is a MongoDB implementation for storing the API data.
+//The Repository interface is implemented
+//This repository injects the database driver that will handle the communication between the aplication and MongoDB
 const (
 	DBName                 = "questionary"
 	QuestionInfoCollection = "questionInfo"

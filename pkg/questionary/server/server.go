@@ -9,9 +9,8 @@ import (
 	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
 )
 
-// Use as a wrapper around the handler functions.
-type rootHandler func(http.ResponseWriter, *http.Request) error
-
+//This is the HTTP Server that will handle all avaliable operations of the API
+//The endpoints configuration is used to instantiate all routes.
 func NewHTTPServer(ctx context.Context, endpoints transport.Endpoints) http.Handler {
 
 	router := mux.NewRouter()

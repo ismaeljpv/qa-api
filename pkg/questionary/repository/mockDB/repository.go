@@ -15,6 +15,8 @@ import (
 	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
 
+//This is a Mock implementation of a real database using in memory data
+//The Repository interface is implemented
 var questionData = []domain.QuestionInfo{
 	{
 		Question: domain.Question{

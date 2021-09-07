@@ -1,5 +1,7 @@
 package domain
 
+//Domains that represents the structures of the database schemas
+
 type Question struct {
 	ID        string `json:"id,omitempty"`
 	Statement string `json:"statement" validate:"required"`

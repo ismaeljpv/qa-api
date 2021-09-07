@@ -15,6 +15,9 @@ import (
 	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
 
+//This is the business logic implementation of the Questionary API
+//The Service interface is implemented
+//This service injects the repository that will handle the database integration
 type service struct {
 	repository repository.Repository
 	logger     log.Logger

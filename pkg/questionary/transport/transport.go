@@ -13,7 +13,8 @@ import (
 	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
 )
 
-// Use as a wrapper around the handler functions.
+//This is the decode/encode handlers that will decode the request and encode the response returned by the API
+
 type errorHandler func(http.ResponseWriter, *http.Request) error
 
 var validate *validator.Validate = validator.New()

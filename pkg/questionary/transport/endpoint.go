@@ -9,6 +9,8 @@ import (
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
 )
 
+//This is the enpoint configuration to instantiate all avaliable routes for the server.
+//Its injects the service to handle the data recieved in the request and process the response.
 type Endpoints struct {
 	FindAllQuestions    endpoint.Endpoint
 	FindQuestionById    endpoint.Endpoint
