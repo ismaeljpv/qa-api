@@ -12,7 +12,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	repo "github.com/ismaeljpv/qa-api/pkg/questionary/repository"
-	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/http/error"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

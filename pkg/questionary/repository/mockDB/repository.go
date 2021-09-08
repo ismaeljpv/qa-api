@@ -12,7 +12,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	repo "github.com/ismaeljpv/qa-api/pkg/questionary/repository"
-	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/http/error"
 )
 
 //This is a Mock implementation of a real database using in memory data

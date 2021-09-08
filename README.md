@@ -4,6 +4,7 @@ Q&amp;A Basic API developed with GO and GOKIT
 The technologies implemented in this API are:
 - Go
 - Gorilla/mux
+- gRPC
 - Gokit
 - Docker
 - Testify

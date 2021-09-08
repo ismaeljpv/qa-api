@@ -15,7 +15,7 @@ WORKDIR /app
 # Copy the code into the container
 COPY . .
 
-WORKDIR /app/cmd/questionary
+WORKDIR /app/cmd/questionary/server
 
 # Build the application
 RUN go build -o main .
@@ -24,13 +24,14 @@ RUN go build -o main .
 WORKDIR /dist
 
 # Copy binary from build to main folder
-RUN cp /app/cmd/questionary/main .
+RUN cp /app/cmd/questionary/server/main .
 
 # Copy .env file
 RUN cp /app/.env .
 
 # Export necessary port
 EXPOSE 8080
+EXPOSE 50051
 
 # Command to run when starting the container
 CMD ["./main"]

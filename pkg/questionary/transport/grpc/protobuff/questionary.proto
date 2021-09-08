@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option go_package = "github.com/ismaeljpv/qa-api/pkg/questionary/transport/grpc/protobuff";
+
+import "google/protobuf/wrappers.proto";
+
+message Question {
+    string ID = 1;
+    string statement = 2;
+    string UserID = 3;
+    int64 CreatedOn = 4;
+}
+
+message Answer {
+    string ID = 1;
+    string Answer = 2;
+    string UserID = 3;
+    string QuestionID = 4;
+    int64 CreatedOn = 5;
+}
+
+message QuestionInfo {
+    Question Question = 1;
+    Answer Answer = 2;
+}
+
+message Questions {
+    repeated QuestionInfo Questions = 1;
+}
+
+message GenericMessage {
+    string message = 1;
+}
+
+message QuestionUpdate {
+    QuestionInfo QuestionInfo = 1;
+    string QuestionID = 2;
+}
+
+message EmptyMessage {}
+
+service QuestionaryService {
+    rpc FindAll(EmptyMessage) returns (Questions);
+    rpc FindByUser(google.protobuf.StringValue) returns (Questions);
+    rpc FindByID(google.protobuf.StringValue) returns (QuestionInfo);
+    rpc Create(Question) returns (Question);
+    rpc Update(QuestionUpdate) returns (QuestionInfo);
+    rpc AddAnswer(Answer) returns (QuestionInfo);
+    rpc Delete(google.protobuf.StringValue) returns (GenericMessage);
+}
