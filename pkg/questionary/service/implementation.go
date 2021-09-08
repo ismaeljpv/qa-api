@@ -12,7 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/repository"
-	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/error"
+	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/http/error"
 )
 
 //This is the business logic implementation of the Questionary API
