@@ -26,6 +26,7 @@ type gRPCServer struct {
 }
 
 func NewGRPCServer(endpoints transport.Endpoints, logger log.Logger) pb.QuestionaryServiceServer {
+
 	return &gRPCServer{
 		findAll: grpc.NewServer(
 			endpoints.FindAllQuestions,

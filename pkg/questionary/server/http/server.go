@@ -16,7 +16,7 @@ func NewHTTPServer(ctx context.Context, endpoints transport.Endpoints) http.Hand
 	router := mux.NewRouter()
 	router.Use(commonMiddleware)
 	serverOpts := []httptransport.ServerOption{
-		httptransport.ServerErrorEncoder(transport.ErrorHandler),
+		httptransport.ServerErrorEncoder(transport.HTTPErrorHandler),
 	}
 
 	router.Methods("GET").Path("/question").Handler(httptransport.NewServer(

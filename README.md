@@ -17,23 +17,21 @@ This are the minimum system requirements that will be needed to execute the API
 - Docker
 - MongoDB
 - MockGen (recommended for testing purposes)
+- Protoc (used for protobuff files generation)
 
 # Get going
 
 Once you have the project in your machine and the minimun system requirments, you will need to complete the folloring steps
 
-- Execute `go mod tidy` and then `go mod vendor` to donwload all the dependencies of the project
-- Make sure that add the right database URI on the .env file
-- On the base project directory, run the command `docker compose build` to build the docker image
+- On the base project directory, execute `go mod tidy` and then `go mod vendor` to donwload all the dependencies of the project
+- By default the API start with its own Mongo database manage by the docker compose file configuration, if you're using a remote mongoDB host, make sure that change the database URI variable (MONGODB_URI) on the .env file
+- Run the command `docker compose build` to build the docker image
 - Once the image if ready, run the command `docker compose up` to start the server. 
-- OPTIONAL: if you want the server running in detached moded, run the command `docker compose up -d`.
+- OPTIONAL: if you want the server running in detached moded, run the command `docker compose up -d`
 
-If your running the mongoDB docker image (recommended), follow this next steps:
-- Create the private network qa-net running the command `docker network create -d bridge qa-net`.
-- Add the MongoDb container to the network running the command `docker run -dit --rm --name mongoDB -p 27017:27017 --network qa-net mongo`, for reference see the docker documentation [a link](https://docs.docker.com/engine/reference/commandline/network_connect)
-- Check if the image is runnig on the private network with the command `docker network inspect qa-net`
+NOTE: You can test the REST endpoints with the request.http file, if you wanna test the gRPC endpoints, open a new terminal (while the app is running) and run the command `go run cmd/questionary/client/grpc/main.go`
 
-And thats it, you are ready to go :)
+And thats it, you are ready to GO :)
 
 
 

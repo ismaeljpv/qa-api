@@ -7,6 +7,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/service"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
 )
 
 //This is the enpoint configuration to instantiate all avaliable routes for the HTTP server.
@@ -42,7 +43,7 @@ func makeFindAllQuestionsEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeFindQuestionByIDEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(IDParamRequest)
+		req := request.(transport.IDParamRequest)
 		question, err := s.FindByID(ctx, req.ID)
 		return question, err
 	}
@@ -50,7 +51,7 @@ func makeFindQuestionByIDEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeFindQuestiosnByUserEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(FindQuestionsByUserRequest)
+		req := request.(transport.FindQuestionsByUserRequest)
 		questions, err := s.FindByUser(ctx, req.UserID)
 		return questions, err
 	}
@@ -74,7 +75,7 @@ func makeAddAnswerEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeUpdateQuestionEndPoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateQuestionRequest)
+		req := request.(transport.UpdateQuestionRequest)
 		questionInfo, err := s.Update(ctx, req.QuestionInfo, req.ID)
 		return questionInfo, err
 	}
@@ -82,10 +83,10 @@ func makeUpdateQuestionEndPoint(s service.Service) endpoint.Endpoint {
 
 func makeDeleteQuestionEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(IDParamRequest)
+		req := request.(transport.IDParamRequest)
 		msg, err := s.Delete(ctx, req.ID)
 
-		return GenericMessageResponse{
+		return transport.GenericMessageResponse{
 			Message: msg,
 			Status:  http.StatusText(http.StatusOK),
 			Code:    http.StatusOK,

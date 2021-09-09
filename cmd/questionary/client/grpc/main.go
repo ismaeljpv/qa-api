@@ -32,11 +32,6 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
-	question, err := client.FindByID(ctx, wrapperspb.String("de8b8892-d64e-4651-9416-b0b7472b4737"))
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	newQuestion := &protobuff.Question{
 		Statement: "is gRPC great?",
 		UserID:    "3",
@@ -54,6 +49,16 @@ func main() {
 	updatedInfo, err := client.AddAnswer(ctx, newAnswer)
 	if err != nil {
 		fmt.Println(err.Error())
+	}
+
+	question, err := client.FindByID(ctx, wrapperspb.String(updatedInfo.GetQuestion().GetID()))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	notFound, err := client.FindByID(ctx, wrapperspb.String("xxx"))
+	if err != nil {
+		fmt.Printf("\nerror => %v , value returned = %v\n\n", err.Error(), notFound)
 	}
 
 	updatedInfo.Question.Statement = "do you think gRPC great?"

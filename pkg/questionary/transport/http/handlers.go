@@ -4,56 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
 	httpError "github.com/ismaeljpv/qa-api/pkg/questionary/transport/http/error"
 )
 
+//
 //This is the decode/encode handlers that will decode the request and encode the response returned by the API in HTTP protocol
-
-type errorHandler func(http.ResponseWriter, *http.Request) error
-
-var validate *validator.Validate = validator.New()
-
-type (
-	GenericRequest struct{}
-
-	FindQuestionsByUserRequest struct {
-		UserID string `json:"userId"`
-	}
-
-	UpdateQuestionRequest struct {
-		ID           string              `json:"ID"`
-		QuestionInfo domain.QuestionInfo `json:"questionInfo"`
-	}
-
-	IDParamRequest struct {
-		ID string `json:"ID"`
-	}
-
-	GenericMessageResponse struct {
-		Message string `json:"message"`
-		Status  string `json:"status"`
-		Code    int64  `json:"code"`
-	}
-)
-
-func validateStruct(v *validator.Validate, s interface{}) error {
-	errors := validate.Struct(s)
-	if errors != nil {
-		for _, err := range errors.(validator.ValidationErrors) {
-			return httpError.NewClientError(err,
-				http.StatusBadRequest,
-				fmt.Sprintf("Error on field %v, data is %v", err.Field(), err.ActualTag()),
-			)
-		}
-	}
-	return nil
-}
+//
 
 func DecodeIDParamRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	id, ok := mux.Vars(r)["id"]
@@ -62,11 +23,11 @@ func DecodeIDParamRequest(ctx context.Context, r *http.Request) (interface{}, er
 			http.StatusBadRequest,
 			"Question ID is required")
 	}
-	return IDParamRequest{ID: id}, nil
+	return transport.IDParamRequest{ID: id}, nil
 }
 
 func DecodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req GenericRequest
+	var req transport.GenericRequest
 	return req, nil
 }
 
@@ -78,7 +39,7 @@ func DecodeFindQuestionByUserRequest(ctx context.Context, r *http.Request) (inte
 			http.StatusBadRequest,
 			"User ID is required")
 	}
-	return FindQuestionsByUserRequest{UserID: userId}, nil
+	return transport.FindQuestionsByUserRequest{UserID: userId}, nil
 }
 
 func DecodeCreateQuestionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -88,9 +49,12 @@ func DecodeCreateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 		return nil, err
 	}
 
-	valErr := validateStruct(validate, body)
+	valErr := transport.ValidateStruct(&body)
 	if valErr != nil {
-		return nil, valErr
+		return nil, httpError.NewClientError(valErr,
+			http.StatusBadRequest,
+			valErr.Error(),
+		)
 	}
 
 	return body, nil
@@ -103,16 +67,19 @@ func DecodeAddAnswerRequest(ctx context.Context, r *http.Request) (interface{}, 
 		return nil, err
 	}
 
-	valErr := validateStruct(validate, &body)
+	valErr := transport.ValidateStruct(&body)
 	if valErr != nil {
-		return nil, valErr
+		return nil, httpError.NewClientError(valErr,
+			http.StatusBadRequest,
+			valErr.Error(),
+		)
 	}
 
 	return body, nil
 }
 
 func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req UpdateQuestionRequest
+	var req transport.UpdateQuestionRequest
 	var info domain.QuestionInfo
 
 	quetionId, ok := mux.Vars(r)["id"]
@@ -129,9 +96,12 @@ func DecodeUpdateQuestionRequest(ctx context.Context, r *http.Request) (interfac
 
 	req.ID = quetionId
 	req.QuestionInfo = info
-	valErr := validateStruct(validate, &req.QuestionInfo)
+	valErr := transport.ValidateStruct(&req.QuestionInfo)
 	if valErr != nil {
-		return nil, valErr
+		return nil, httpError.NewClientError(valErr,
+			http.StatusBadRequest,
+			valErr.Error(),
+		)
 	}
 
 	return req, nil
@@ -142,7 +112,7 @@ func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	return json.NewEncoder(w).Encode(response)
 }
 
-func ErrorHandler(ctx context.Context, err error, w http.ResponseWriter) {
+func HTTPErrorHandler(ctx context.Context, err error, w http.ResponseWriter) {
 
 	switch er := err.(type) {
 	case httpError.ClientError:

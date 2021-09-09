@@ -75,7 +75,7 @@ func main() {
 		level.Info(logger).Log("msg", fmt.Sprintf("GRPC Server started listening on port %v", grpcAddr))
 		baseServer := grpc.NewServer()
 		pb.RegisterQuestionaryServiceServer(baseServer, grpcServer)
-		baseServer.Serve(grpcListener)
+		errs <- baseServer.Serve(grpcListener)
 	}()
 
 	go func() {

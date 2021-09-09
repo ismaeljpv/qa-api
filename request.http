@@ -3,7 +3,7 @@ GET http://localhost:8080/question
 Content-Type: application/json
 
 ### Get Question By ID
-GET http://localhost:8080/question/c1ced94c-a190-4122-9849-5244b551218c
+GET http://localhost:8080/question/229a58e6-25a5-49b1-a09d-56026bb42b9c
 Content-Type: application/json
 
 ### Get Question By User
@@ -15,8 +15,8 @@ POST http://localhost:8080/question
 Content-Type: application/json
 
 {   
-    "statement": "What do you recomend to build microsevices whit Go?",
-    "userId": "4"
+    "statement": "What do you think about gRPC?",
+    "userId": "1"
 }
 
 ### Add answer to question
@@ -24,9 +24,9 @@ POST http://localhost:8080/question/answer
 Content-Type: application/json
 
 {   
-    "anwser": "I strongly recomend GoKit features for microservices delelopment with Go",
-    "userId": "33",
-    "questionId": "e52f65ac-22fd-45b8-80fd-6d1e6b34445a"
+    "anwser": "gRPC is a great way of handle internal microservice communication.",
+    "userId": "22",
+    "questionId": "21f78b65-6443-4377-8b48-9cb0fb398091"
 }
 
 ### Update Question And Answer
@@ -50,5 +50,5 @@ Content-Type: application/json
   }
 
 ### Delete Question
-DELETE http://localhost:8080/question/0cb5cd65-251f-4ade-97e3-89b20fe22676
+DELETE http://localhost:8080/question/8940b1fd-8bfe-4cd8-9360-d3ae3bb48074
 Content-Type: application/json

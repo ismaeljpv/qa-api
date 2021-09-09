@@ -3,55 +3,27 @@ package grpc
 import (
 	"context"
 	"errors"
-	"fmt"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/ismaeljpv/qa-api/pkg/questionary/domain"
-	"github.com/ismaeljpv/qa-api/pkg/questionary/transport/grpc/protobuff"
+	"github.com/ismaeljpv/qa-api/pkg/questionary/transport"
+	pb "github.com/ismaeljpv/qa-api/pkg/questionary/transport/grpc/protobuff"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+//
 //This is the decode/encode handlers that will decode the request and encode the response returned by the API in gRPC protocol
-
-var validate *validator.Validate = validator.New()
-
-type (
-	GenericRequest struct{}
-
-	FindQuestionsByUserRequest struct {
-		UserID string `json:"userId"`
-	}
-
-	UpdateQuestionRequest struct {
-		ID           string              `json:"ID"`
-		QuestionInfo domain.QuestionInfo `json:"questionInfo"`
-	}
-
-	IDParamRequest struct {
-		ID string `json:"ID"`
-	}
-)
-
-func validateStruct(v *validator.Validate, s interface{}) error {
-	errs := validate.Struct(s)
-	if errs != nil {
-		for _, err := range errs.(validator.ValidationErrors) {
-			return errors.New(fmt.Sprintf("Error validating body, error => %v", err.Error()))
-		}
-	}
-	return nil
-}
+//
 
 func DecodeIDParamRequest(ctx context.Context, request interface{}) (interface{}, error) {
 	id, ok := request.(*wrapperspb.StringValue)
 	if !ok || id == nil {
 		return nil, errors.New("Question ID is required")
 	}
-	return IDParamRequest{ID: id.GetValue()}, nil
+	return transport.IDParamRequest{ID: id.GetValue()}, nil
 }
 
 func DecodeRequest(ctx context.Context, request interface{}) (interface{}, error) {
-	var req GenericRequest
+	var req transport.GenericRequest
 	return req, nil
 }
 
@@ -60,12 +32,12 @@ func DecodeFindQuestionByUserRequest(ctx context.Context, request interface{}) (
 	if !ok || userId == nil {
 		return nil, errors.New("UserID ID is required")
 	}
-	return FindQuestionsByUserRequest{UserID: userId.GetValue()}, nil
+	return transport.FindQuestionsByUserRequest{UserID: userId.GetValue()}, nil
 }
 
 func DecodeCreateQuestionRequest(ctx context.Context, request interface{}) (interface{}, error) {
 	var newQuestion domain.Question
-	body, ok := request.(*protobuff.Question)
+	body, ok := request.(*pb.Question)
 	if !ok || body == nil {
 		return nil, errors.New("No body found in the request")
 	}
@@ -73,7 +45,7 @@ func DecodeCreateQuestionRequest(ctx context.Context, request interface{}) (inte
 	newQuestion.Statement = body.GetStatement()
 	newQuestion.UserID = body.GetUserID()
 
-	valErr := validateStruct(validate, &newQuestion)
+	valErr := transport.ValidateStruct(&newQuestion)
 	if valErr != nil {
 		return nil, valErr
 	}
@@ -83,7 +55,7 @@ func DecodeCreateQuestionRequest(ctx context.Context, request interface{}) (inte
 
 func DecodeAddAnswerRequest(ctx context.Context, request interface{}) (interface{}, error) {
 	var newAnswer domain.Answer
-	body, ok := request.(*protobuff.Answer)
+	body, ok := request.(*pb.Answer)
 	if !ok || body == nil {
 		return nil, errors.New("No body found in the request")
 	}
@@ -92,7 +64,7 @@ func DecodeAddAnswerRequest(ctx context.Context, request interface{}) (interface
 	newAnswer.UserID = body.GetUserID()
 	newAnswer.QuestionID = body.GetQuestionID()
 
-	valErr := validateStruct(validate, &newAnswer)
+	valErr := transport.ValidateStruct(&newAnswer)
 	if valErr != nil {
 		return nil, valErr
 	}
@@ -101,9 +73,9 @@ func DecodeAddAnswerRequest(ctx context.Context, request interface{}) (interface
 }
 
 func DecodeUpdateQuestionRequest(ctx context.Context, request interface{}) (interface{}, error) {
-	var req UpdateQuestionRequest
+	var req transport.UpdateQuestionRequest
 	var info domain.QuestionInfo
-	questionUpdate, ok := request.(*protobuff.QuestionUpdate)
+	questionUpdate, ok := request.(*pb.QuestionUpdate)
 	if !ok || questionUpdate == nil {
 		return nil, errors.New("No body found in the request")
 	}
@@ -125,7 +97,7 @@ func DecodeUpdateQuestionRequest(ctx context.Context, request interface{}) (inte
 
 	req.ID = questionUpdate.QuestionID
 	req.QuestionInfo = info
-	valErr := validateStruct(validate, &req.QuestionInfo)
+	valErr := transport.ValidateStruct(&req.QuestionInfo)
 	if valErr != nil {
 		return nil, valErr
 	}
@@ -134,17 +106,17 @@ func DecodeUpdateQuestionRequest(ctx context.Context, request interface{}) (inte
 }
 
 func EncodeGetQuestionsResponse(_ context.Context, response interface{}) (interface{}, error) {
-	var result protobuff.Questions
-	var resQuestions = make([]*protobuff.QuestionInfo, 0)
+	var result pb.Questions
+	var resQuestions = make([]*pb.QuestionInfo, 0)
 	questions, ok := response.([]domain.QuestionInfo)
 	if !ok {
-		return []*protobuff.QuestionInfo{}, errors.New("Error parsing the response for gRPC Questions message")
+		return []*pb.QuestionInfo{}, errors.New("Error parsing the response for gRPC Questions message")
 	}
 
 	for _, question := range questions {
-		var info protobuff.QuestionInfo
-		info.Question = &protobuff.Question{}
-		info.Answer = &protobuff.Answer{}
+		var info pb.QuestionInfo
+		info.Question = &pb.Question{}
+		info.Answer = &pb.Answer{}
 
 		info.Question.ID = question.Question.ID
 		info.Question.Statement = question.Question.Statement
@@ -164,14 +136,14 @@ func EncodeGetQuestionsResponse(_ context.Context, response interface{}) (interf
 }
 
 func EncodeQuestionInfoResponse(_ context.Context, response interface{}) (interface{}, error) {
-	var info protobuff.QuestionInfo
+	var info pb.QuestionInfo
 	question, ok := response.(domain.QuestionInfo)
 	if !ok {
-		return &protobuff.QuestionInfo{}, errors.New("Error parsing the response for gRPC QuestionInfo message")
+		return &pb.QuestionInfo{}, errors.New("Error parsing the response for gRPC QuestionInfo message")
 	}
 
-	info.Question = &protobuff.Question{}
-	info.Answer = &protobuff.Answer{}
+	info.Question = &pb.Question{}
+	info.Answer = &pb.Answer{}
 
 	info.Question.ID = question.Question.ID
 	info.Question.Statement = question.Question.Statement
@@ -187,12 +159,12 @@ func EncodeQuestionInfoResponse(_ context.Context, response interface{}) (interf
 }
 
 func EncodeQuestionResponse(_ context.Context, response interface{}) (interface{}, error) {
-	var info *protobuff.Question
+	var info *pb.Question
 	question, ok := response.(domain.Question)
 	if !ok {
-		return &protobuff.Question{}, errors.New("Error parsing the response for gRPC Question message")
+		return &pb.Question{}, errors.New("Error parsing the response for gRPC Question message")
 	}
-	info = &protobuff.Question{}
+	info = &pb.Question{}
 	info.ID = question.ID
 	info.Statement = question.Statement
 	info.UserID = question.UserID
@@ -201,12 +173,12 @@ func EncodeQuestionResponse(_ context.Context, response interface{}) (interface{
 }
 
 func EncodeGenericMessageResponse(_ context.Context, response interface{}) (interface{}, error) {
-	var resp *protobuff.GenericMessage
+	var resp *pb.GenericMessage
 	message, ok := response.(string)
 	if !ok {
-		return &protobuff.GenericMessage{}, errors.New("Error parsing the response for gRPC GenericMessage message")
+		return &pb.GenericMessage{}, errors.New("Error parsing the response for gRPC GenericMessage message")
 	}
-	resp = &protobuff.GenericMessage{}
+	resp = &pb.GenericMessage{}
 	resp.Message = message
 	return resp, nil
 }
