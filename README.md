@@ -21,7 +21,7 @@ This are the minimum system requirements that will be needed to execute the API
 
 # Get going
 
-Once you have the project in your machine and the minimun system requirments, you will need to complete the folloring steps:
+Once you have the project in your machine and the minimun system requirments, you will need to complete the following steps:
 
 - On the base project directory, execute `go mod tidy` and then `go mod vendor` to donwload all the dependencies of the project
 
